@@ -263,7 +263,16 @@
                                 <ul class="nk-quick-nav">
                                     <li class="dropdown notification-dropdown">
                                         <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                                            <div class="icon-status icon-status-warning"><em class="icon ni ni-bell text-danger"></em></div>
+                                            <?php if (!empty($logs)) : ?>
+                                                <div class="icon-status icon-status-warning">
+                                                    <em class="icon ni ni-bell text-danger"></em>
+                                                </div>
+                                            <?php else : ?>
+                                                <!-- Jika tidak ada notifikasi, maka tidak ada ikon yang ditampilkan -->
+                                                <div>
+                                                    <em class="icon ni ni-bell text-danger"></em>
+                                                </div>
+                                            <?php endif; ?>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end">
                                             <div class="dropdown-head">
