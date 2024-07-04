@@ -77,63 +77,77 @@
                     <div class="tab-content mt-3">
                         <div class="tab-pane active" id="file-grid-view">
                             <div class="row">
-                                <div class="col" id="document-container"> <!-- Tambahkan ID disini -->
-                                    <?php foreach ($types as $type) : ?>
-                                        <?php
-                                        // Ambil documents berdasarkan type_id
+                                <div class="col" id="document-container">
+                                    <?php
+                                    $all_documents_empty = true;
+                                    foreach ($types as $type) {
                                         $filtered_documents = isset($documents_by_type[$type->id]) ? $documents_by_type[$type->id] : [];
-
-                                        // Jika tidak ada documents untuk type ini, skip tampilannya
-                                        if (empty($filtered_documents)) {
-                                            continue;
+                                        if (!empty($filtered_documents)) {
+                                            $all_documents_empty = false;
+                                            break;
                                         }
-                                        ?>
-                                        <div class="row mb-4">
-                                            <div class="col mt-3">
-                                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                    <h4><?= $type->name ?></h4>
-                                                    <a id="listData<?= $type->id ?>" data-type-name="<?= $type->name ?>" style="text-decoration: none; color: #E11C1C;">
-                                                        <i class="fa-solid fa-eye"></i>&nbsp; Show All
-                                                    </a>
-                                                </div>
-                                                <div style="height: 2px; background: gray; margin-top: 10px;"></div>
-                                            </div>
+                                    }
+
+                                    if ($all_documents_empty) : ?>
+                                        <div class="d-flex justify-content-center align-items-center flex-column" style="height: 100vh;">
+                                            <img src="<?= base_url('assets/images/no.webp') ?>" alt="No Data" style="max-width: 300px; max-height: 300px;">
+                                            <p class="mt-3">No documents available</p>
                                         </div>
-                                        <div class="row">
-                                            <?php foreach ($filtered_documents as $doc) : ?>
-                                                <div class="col-md-4 mb-4">
-                                                    <div class="card h-100">
-                                                        <?php if ($doc->thumbnail != null) : ?>
-                                                            <img src="<?= base_url('uploads/thumbnail/') . $doc->thumbnail ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom<?= $doc->id ?>" style="max-height: 200px; object-fit: cover;">
-                                                        <?php else : ?>
-                                                            <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
-                                                                <img src="<?= base_url('assets/images/pdf.png') ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom<?= $doc->id ?>" style="max-width: 80%; max-height: 80%; object-fit: contain;">
+                                    <?php else : ?>
+                                        <?php foreach ($types as $type) : ?>
+                                            <?php
+                                            $filtered_documents = isset($documents_by_type[$type->id]) ? $documents_by_type[$type->id] : [];
+                                            if (empty($filtered_documents)) {
+                                                continue;
+                                            }
+                                            ?>
+                                            <div class="row mb-4">
+                                                <div class="col mt-3">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                        <h4><?= $type->name ?></h4>
+                                                        <a id="listData<?= $type->id ?>" data-type-name="<?= $type->name ?>" style="text-decoration: none; color: #E11C1C;">
+                                                            <i class="fa-solid fa-eye"></i>&nbsp; Show All
+                                                        </a>
+                                                    </div>
+                                                    <div style="height: 2px; background: gray; margin-top: 10px;"></div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <?php foreach ($filtered_documents as $doc) : ?>
+                                                    <div class="col-md-4 mb-4">
+                                                        <div class="card h-100">
+                                                            <?php if ($doc->thumbnail != null) : ?>
+                                                                <img src="<?= base_url('uploads/thumbnail/') . $doc->thumbnail ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom<?= $doc->id ?>" style="max-height: 200px; object-fit: cover;">
+                                                            <?php else : ?>
+                                                                <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                                                                    <img src="<?= base_url('assets/images/pdf.png') ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom<?= $doc->id ?>" style="max-width: 80%; max-height: 80%; object-fit: contain;">
+                                                                </div>
+                                                            <?php endif; ?>
+                                                            <div class="card-body">
+                                                                <span><?= $doc->name ?></span>
                                                             </div>
-                                                        <?php endif; ?>
-                                                        <div class="card-body">
-                                                            <span><?= $doc->name ?></span>
-                                                        </div>
-                                                        <div class="card-footer d-flex justify-content-between">
-                                                            <small class="text-muted"><?= date('d F Y', strtotime($doc->upload_date)) ?></small>
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-link text-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?= $doc->id ?>" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <i class="fa-solid fa-ellipsis-v"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $doc->id ?>">
-                                                                    <li><a class="dropdown-item" href="<?= base_url('download-document/' . $doc->id) ?>">Download</a></li>
-                                                                    <li><a class="dropdown-item" href="<?= base_url('update-document/' . $doc->id) ?>">Update</a></li>
-                                                                    <li><a class="dropdown-item" href="<?= base_url('remove-document/' . $doc->id) ?>">Remove</a></li>
-                                                                </ul>
+                                                            <div class="card-footer d-flex justify-content-between">
+                                                                <small class="text-muted"><?= date('d F Y', strtotime($doc->upload_date)) ?></small>
+                                                                <div class="dropdown">
+                                                                    <button class="btn btn-link text-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?= $doc->id ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <i class="fa-solid fa-ellipsis-v"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $doc->id ?>">
+                                                                        <li><a class="dropdown-item" href="<?= base_url('download-document/' . $doc->id) ?>">Download</a></li>
+                                                                        <li><a class="dropdown-item" href="<?= base_url('update-document/' . $doc->id) ?>">Update</a></li>
+                                                                        <li><a class="dropdown-item" href="<?= base_url('remove-document/' . $doc->id) ?>">Remove</a></li>
+                                                                    </ul>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    <?php endforeach; ?>
-
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
+
                         </div><!-- .tab-pane -->
                     </div>
 
