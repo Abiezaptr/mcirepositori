@@ -179,7 +179,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?= site_url('tracking') ?>" class="fn__tooltip menu__item" data-position="right" title="Log Tracking">
+                                <a href="<?= site_url('log-history') ?>" class="fn__tooltip menu__item" data-position="right" title="Log Tracking">
                                     <span class="icon"><img src="<?= base_url('assets/images') ?>/log.svg" alt="" class="fn__svg"></span>
                                     <span class="text">Log Tracking</span>
                                 </a>
