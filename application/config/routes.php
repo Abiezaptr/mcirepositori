@@ -24,3 +24,6 @@ $route['log-history'] = 'login/login_history';
 $route['user-management'] = 'users/index';
 $route['add-permission'] = 'users/view_add_permission';
 $route['process-permission'] = 'users/process_add_permission';
+
+// Rute untuk settings
+$route['profile'] = 'settings/profile';

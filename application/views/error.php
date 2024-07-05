@@ -11,8 +11,8 @@
     <title><?= $title; ?> - MCI Telkomsel </title>
     <link rel="icon" type="image/png" sizes="96x96" href="<?= base_url('assets') ?>/images/favicon.png">
     <!-- StyleSheets  -->
-    <link rel="stylesheet" href="./assets/css/dashlite.css?ver=3.0.0">
-    <link id="skin-default" rel="stylesheet" href="./assets/css/theme.css?ver=3.0.0">
+    <link rel="stylesheet" href="<?= base_url('assets') ?>/css/dashlite.css?ver=3.0.0">
+    <link id="skin-default" rel="stylesheet" href="<?= base_url('assets') ?>/css/theme.css?ver=3.0.0">
 </head>
 
 <body class="nk-body bg-white npc-default pg-error">
@@ -25,12 +25,13 @@
                 <div class="nk-content ">
                     <div class="nk-block nk-block-middle wide-md mx-auto">
                         <div class="nk-block-content nk-error-ld text-center">
-                            <img class="nk-error-gfx" src="./images/gfx/error-404.svg" alt="">
+                            <img class="nk-error-gfx" src="<?= base_url('assets/images') ?>/dev.avif" alt="">
                             <div class="wide-xs mx-auto">
                                 <h3 class="nk-error-title">Oops! Why you’re here?</h3>
-                                <p class="nk-error-text">We are very sorry for inconvenience. It looks like you’re try to access a page that either has been deleted or never existed.</p>
-                                <a href="html/index.html" class="btn btn-lg btn-primary mt-2">Back To Home</a>
+                                <p class="nk-error-text">We apologize for the inconvenience. It looks like this page is currently under development.</p>
+                                <a href="<?= base_url('home') ?>" class="btn btn-lg btn-primary mt-2">Back To Home</a>
                             </div>
+
                         </div>
                     </div><!-- .nk-block -->
                 </div>

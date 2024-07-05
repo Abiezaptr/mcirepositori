@@ -230,7 +230,7 @@
                                 <?php endif; ?>
 
                                 <li class="nk-menu-item">
-                                    <a href="#" class="nk-menu-link">
+                                    <a href="<?= site_url('settings') ?>" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-account-setting"></em></span>
                                         <span class="nk-menu-text">Settings</span>
                                     </a>
@@ -328,7 +328,7 @@
                                             </div>
                                             <div class="dropdown-inner">
                                                 <ul class="link-list">
-                                                    <li><a href="<?= site_url('') ?>"><em class="icon ni ni-user-alt"></em><span>My Profile</span></a></li>
+                                                    <li><a href="<?= site_url('profile') ?>"><em class="icon ni ni-user-alt"></em><span>My Profile</span></a></li>
                                                 </ul>
                                             </div>
                                             <div class="dropdown-inner">
