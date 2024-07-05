@@ -132,11 +132,11 @@
                                                                     <button class="btn btn-link text-secondary dropdown-toggle" type="button" id="dropdownMenuButton<?= $doc->id ?>" data-bs-toggle="dropdown" aria-expanded="false">
                                                                         <i class="fa-solid fa-ellipsis-v"></i>
                                                                     </button>
+                                                                    <!-- Contoh penggunaan dalam template HTML -->
                                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $doc->id ?>">
-                                                                        <li><a class="dropdown-item" href="<?= base_url('download-document/' . $doc->id) ?>">Download</a></li>
-                                                                        <li><a class="dropdown-item" href="<?= base_url('update-document/' . $doc->id) ?>">Update</a></li>
-                                                                        <li><a class="dropdown-item" href="<?= base_url('remove-document/' . $doc->id) ?>">Remove</a></li>
+                                                                        <li><a class="dropdown-item download-link" href="<?= base_url('uploads/' . $doc->file) ?>" data-user-id="<?= $this->session->userdata('id') ?>" data-document-id="<?= $doc->id ?>" download>Download</a></li>
                                                                     </ul>
+
                                                                 </div>
                                                             </div>
                                                         </div>

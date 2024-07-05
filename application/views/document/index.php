@@ -72,7 +72,7 @@
                                                           <button type="button" class="btn btn-primary btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#modalAlert2">Generate with AI</button>
                                                       </div>
                                                       <div class="form-control-wrap">
-                                                          <textarea name="summary" class="tinymce-basic form-control">Hello, World!</textarea>
+                                                          <textarea name="summary" class="tinymce-basic form-control"></textarea>
                                                       </div>
                                                   </div>
                                               </div>

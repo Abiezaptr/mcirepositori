@@ -212,6 +212,40 @@ class Document extends CI_Controller
         $this->load->view('template/footer');
     }
 
+    public function download_document($id)
+    {
+        $data['title'] = "Detail Document";
+
+        $this->db->select('document.*, type.name as type_name');
+        $this->db->from('document');
+        $this->db->join('type', 'type.id = document.type_id');
+        $this->db->where('document.id', $id);
+        $document = $this->db->get()->row();
+
+        if ($document) {
+            $filename = pathinfo($document->file, PATHINFO_FILENAME);
+            $filename = preg_replace('/[_\-]+/', ' ', $filename); // Replace underscores and dashes with spaces
+            $filename = preg_replace('/\d{2,4}/', '', $filename); // Remove consecutive digits
+            $filename = ucwords($filename); // Capitalize each word
+            $document->file_name = $filename;
+
+            // Update or insert into user_views
+            $user_id = $this->session->userdata('id'); // Assume user_id is stored in session
+            $this->updateUserViews($user_id, $id);
+
+            // Log document view
+            $this->log_document_view($user_id, $id);
+        }
+
+        $data['document'] = $document;
+        $data['logs'] = $this->get_upload_logs();
+        $data['read_logs'] = $this->get_user_read_logs();
+
+        $this->load->view('template/header', $data);
+        $this->load->view('document/detail', $data);
+        $this->load->view('template/footer');
+    }
+
     private function log_document_view($user_id, $document_id)
     {
         // Get IP address and browser info
@@ -225,6 +259,48 @@ class Document extends CI_Controller
             'ip_address' => $ip_address
         ]);
     }
+
+    public function log_download_view()
+    {
+        $input = json_decode($this->input->raw_input_stream, true);
+
+        if (isset($input['user_id']) && isset($input['document_id']) && isset($input['ip_address'])) {
+            // Insert data into database
+            $this->db->insert('download_views', [
+                'user_id' => $input['user_id'],
+                'document_id' => $input['document_id'],
+                'ip_address' => $input['ip_address']
+            ]);
+
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid data.']);
+        }
+    }
+
+    public function log()
+    {
+        // Set zona waktu ke Asia/Jakarta
+        date_default_timezone_set('Asia/Jakarta');
+
+        // Ambil data POST dari AJAX request
+        $userId = $this->input->post('user_id');
+        $documentId = $this->input->post('document_id');
+        $ipAddress = $this->input->ip_address(); // Ambil alamat IP pengguna
+
+        // Simpan log download ke database
+        $data = array(
+            'user_id' => $userId,
+            'document_id' => $documentId,
+            'ip_address' => $ipAddress,
+            'download_time' => date('Y-m-d H:i:s')
+        );
+        $this->db->insert('download_views', $data);
+
+        // Kirim respons sukses ke AJAX
+        echo json_encode(['success' => true]);
+    }
+
 
     private function updateUserViews($user_id, $document_id)
     {
@@ -328,23 +404,32 @@ class Document extends CI_Controller
         redirect('home');
     }
 
-    public function remove($document_id)
+    public function remove($id)
     {
-        // mengambil data file berdasarkan document id
-        $this->db->select('file');
+        // Mengambil data file berdasarkan document id
+        $this->db->select('file, thumbnail');
         $this->db->from('document');
-        $this->db->where('document_id', $document_id);
+        $this->db->where('id', $id);
         $query = $this->db->get();
         $document = $query->row();
 
         if ($document) {
+            // Hapus file utama
             $filePath = './uploads/' . $document->file;
             if (file_exists($filePath)) {
                 unlink($filePath); // Menghapus file dari server
             }
 
+            // Hapus thumbnail jika ada
+            if (!empty($document->thumbnail)) {
+                $thumbnailPath = './uploads/thumbnail/' . $document->thumbnail;
+                if (file_exists($thumbnailPath)) {
+                    unlink($thumbnailPath); // Menghapus thumbnail dari server
+                }
+            }
+
             // Menghapus data dari database
-            $this->db->where('document_id', $document_id);
+            $this->db->where('id', $id);
             $this->db->delete('document');
 
             $this->session->set_flashdata('success', 'Document deleted successfully');
@@ -354,6 +439,7 @@ class Document extends CI_Controller
 
         redirect('home');
     }
+
 
     public function get_documents()
     {

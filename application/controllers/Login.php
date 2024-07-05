@@ -117,9 +117,19 @@ class Login extends CI_Controller
 		$query = $this->db->get();
 		$view_document = $query->result();
 
+		// Ambil semua data log dari tabel download document dan gabungkan dengan tabel users
+		$this->db->select('download_views.*, download_views.download_time AS donwnloadtime , document.name AS doc_name, users.username');
+		$this->db->from('download_views');
+		$this->db->join('document', 'download_views.document_id = document.id', 'left'); // Gabungkan dengan tabel document
+		$this->db->join('users', 'download_views.user_id = users.id', 'left'); // Gabungkan dengan tabel users
+		$this->db->order_by('download_views.download_time', 'desc'); // Urutkan berdasarkan waktu login terbaru
+		$query = $this->db->get();
+		$download_document = $query->result();
+
 		// Kirim data ke view
 		$data['login_history'] = $login_history;
 		$data['view_document'] = $view_document;
+		$data['download_document'] = $download_document;
 
 		// notif
 		$data['logs'] = $this->get_upload_logs();

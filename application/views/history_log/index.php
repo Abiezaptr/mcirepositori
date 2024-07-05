@@ -16,13 +16,13 @@
                                <div class="card-inner">
                                    <ul class="nav nav-tabs mt-n3">
                                        <li class="nav-item">
-                                           <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1">Login Activity</a>
+                                           <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1">Login history</a>
                                        </li>
                                        <li class="nav-item">
-                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem2">View Document Activity</a>
+                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem2">Document views history</a>
                                        </li>
                                        <li class="nav-item">
-                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem3">Download Document Activity</a>
+                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem3">Document download history</a>
                                        </li>
                                    </ul>
                                    <div class="tab-content">
@@ -32,7 +32,7 @@
                                                <thead>
                                                    <tr>
                                                        <th>#</th>
-                                                       <th>User</th>
+                                                       <th>Users</th>
                                                        <th>Email</th>
                                                        <th>Login time</th>
                                                        <th>IP</th>
@@ -63,7 +63,7 @@
                                                <thead>
                                                    <tr>
                                                        <th>#</th>
-                                                       <th>User</th>
+                                                       <th>Users</th>
                                                        <th>Document Name</th>
                                                        <th>View time</th>
                                                    </tr>
@@ -83,7 +83,29 @@
                                            </p>
                                        </div>
                                        <div class="tab-pane" id="tabItem3">
-                                           <p></p>
+                                           <p>
+                                           <table class="datatable-init table nowrap table">
+                                               <thead>
+                                                   <tr>
+                                                       <th>#</th>
+                                                       <th>Users</th>
+                                                       <th>Document Name</th>
+                                                       <th>Download time</th>
+                                                   </tr>
+                                               </thead>
+                                               <tbody>
+                                                   <?php $no = 1;
+                                                    foreach ($download_document as $download) : ?>
+                                                       <tr>
+                                                           <td><?= $no++; ?></td>
+                                                           <td><?php echo $download->username; ?></td>
+                                                           <td><?php echo $download->doc_name; ?></td>
+                                                           <td><?php echo $download->donwnloadtime; ?></td>
+                                                       </tr>
+                                                   <?php endforeach; ?>
+                                               </tbody>
+                                           </table>
+                                           </p>
                                        </div>
                                    </div>
                                </div>

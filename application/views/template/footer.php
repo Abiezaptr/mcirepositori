@@ -408,6 +408,160 @@
       });
   </script>
 
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('download-button').addEventListener('click', function(event) {
+              event.preventDefault(); // Prevent default action (redirect)
+
+              // Get document_id from PHP variable
+              var document_id = <?= $document->id ?>;
+
+              // Get user_id from session or input (replace with actual method to retrieve user_id)
+              var user_id = <?= $this->session->userdata('id') ?>; // Example, replace with actual method
+
+              // Get IP address using input->ip_address() (optional)
+              var ip_address = '<?= $this->input->ip_address() ?>'; // Example, replace with actual IP address retrieval if needed
+
+              // Send log request to server
+              fetch('<?= base_url('document/log_download_view') ?>', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                          user_id: user_id,
+                          document_id: document_id,
+                          ip_address: ip_address
+                      })
+                  })
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      // If logging is successful, initiate file download
+                      return fetch('<?= base_url('uploads/' . $document->file) ?>');
+                  })
+                  .then(response => {
+                      return response.blob();
+                  })
+                  .then(blob => {
+                      // Create a new anchor element and set its href attribute to the blob URL
+                      var a = document.createElement('a');
+                      var url = window.URL.createObjectURL(blob);
+                      a.href = url;
+                      a.download = '<?= $document->file ?>'; // Set the filename for download
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      window.URL.revokeObjectURL(url);
+                      console.log('File downloaded successfully');
+                  })
+                  .catch(error => {
+                      console.error('Error downloading file:', error);
+                      // Handle error (if needed)
+                  });
+          });
+      });
+  </script>
+
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var fullScreenButton = document.getElementById('fullScreen');
+          var printButton = document.getElementById('print');
+          var pdfIframe = document.getElementById('pdf-iframe');
+
+          fullScreenButton.addEventListener('click', function(event) {
+              event.preventDefault();
+              toggleFullScreen(pdfIframe);
+          });
+
+          printButton.addEventListener('click', function(event) {
+              event.preventDefault();
+              printPDF(pdfIframe);
+          });
+
+          function toggleFullScreen(element) {
+              if (!document.fullscreenElement && // alternative standard method
+                  !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { // current working methods
+                  if (element.requestFullscreen) {
+                      element.requestFullscreen();
+                  } else if (element.msRequestFullscreen) {
+                      element.msRequestFullscreen();
+                  } else if (element.mozRequestFullScreen) {
+                      element.mozRequestFullScreen();
+                  } else if (element.webkitRequestFullscreen) {
+                      element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                  }
+              } else {
+                  if (document.exitFullscreen) {
+                      document.exitFullscreen();
+                  } else if (document.msExitFullscreen) {
+                      document.msExitFullscreen();
+                  } else if (document.mozCancelFullScreen) {
+                      document.mozCancelFullScreen();
+                  } else if (document.webkitExitFullscreen) {
+                      document.webkitExitFullscreen();
+                  }
+              }
+          }
+
+          function printPDF(element) {
+              if (element.contentWindow) {
+                  element.contentWindow.print();
+              } else {
+                  console.error('Cannot print iframe content');
+              }
+          }
+      });
+  </script>
+
+  <script>
+      $(document).ready(function() {
+          $('.download-link').click(function(e) {
+              e.preventDefault();
+
+              var userId = $(this).data('user-id');
+              var documentId = $(this).data('document-id');
+              var ipAddress = '<?= $this->input->ip_address() ?>'; // Mengambil alamat IP pengguna
+
+              var downloadUrl = $(this).attr('href'); // URL file yang akan diunduh
+
+              // Kirim AJAX request untuk menyimpan log download
+              $.ajax({
+                  type: 'POST',
+                  url: '<?= site_url('document/log') ?>', // Endpoint untuk menyimpan log download, sesuaikan dengan struktur aplikasi Anda
+                  data: {
+                      user_id: userId,
+                      document_id: documentId,
+                      ip_address: ipAddress
+                  },
+                  success: function(response) {
+                      // Handle success if needed
+                      console.log('Download logged successfully.');
+
+                      // Untuk mengunduh file secara langsung oleh browser
+                      var link = document.createElement('a');
+                      link.href = downloadUrl;
+                      link.download = ''; // Nama file akan menggunakan nama asli dari URL
+
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                  },
+                  error: function(xhr, status, error) {
+                      // Handle error
+                      console.error('Error logging download:', error);
+
+                      // Jika terjadi kesalahan, lanjutkan mengarahkan pengguna ke file yang diunduh
+                      window.location.href = downloadUrl;
+                  }
+              });
+          });
+      });
+  </script>
+
+
   </body>
 
   </html>
