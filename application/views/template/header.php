@@ -183,7 +183,7 @@
             <div class="nk-sidebar nk-sidebar-fixed is-light " data-content="sidebarMenu">
                 <div class="nk-sidebar-element nk-sidebar-head">
                     <div class="nk-sidebar-brand">
-                        <a href="" class="logo-link nk-sidebar-logo" style="display: flex; align-items: center;">
+                        <a href="<?= site_url('home') ?>" class="logo-link nk-sidebar-logo" style="display: flex; align-items: center;">
                             <img class="logo-dark logo-img" src="<?= base_url('assets') ?>/images/favicon.png" alt="logo-dark" style="margin-right: 10px;">
                             <span style="font-size: 20px; color: #ff0000; font-family: 'Poppins', sans-serif; font-weight: 900; text-shadow: 1px 1px 2px black;"><strong>MCI Repository</strong></span>
                         </a>
@@ -230,7 +230,7 @@
                                 <?php endif; ?>
 
                                 <li class="nk-menu-item">
-                                    <a href="<?= site_url('settings') ?>" class="nk-menu-link">
+                                    <a href="<?= site_url('under-development') ?>" class="nk-menu-link">
                                         <span class="nk-menu-icon"><em class="icon ni ni-account-setting"></em></span>
                                         <span class="nk-menu-text">Settings</span>
                                     </a>
@@ -279,7 +279,7 @@
                                                 <span class="sub-title nk-dropdown-title">Notifications</span>
                                             </div>
 
-                                            <div class="dropdown-body" id="notification-container">
+                                            <div class="dropdown-body" id="notification-container" style="overflow-y: auto; max-height: 200px;">
                                                 <?php if (!empty($logs)) : ?>
                                                     <?php foreach ($logs as $log) : ?>
                                                         <?php $is_read = in_array($log->id, $read_logs); ?>
@@ -301,7 +301,7 @@
                                             </div>
 
                                             <div class="dropdown-foot center">
-                                                <a href="#">View All</a>
+                                                <a href="<?= site_url('under-development') ?>">View All</a>
                                             </div>
                                         </div>
                                     </li>
@@ -328,7 +328,7 @@
                                             </div>
                                             <div class="dropdown-inner">
                                                 <ul class="link-list">
-                                                    <li><a href="<?= site_url('profile') ?>"><em class="icon ni ni-user-alt"></em><span>My Profile</span></a></li>
+                                                    <li><a href="<?= site_url('under-development') ?>"><em class="icon ni ni-user-alt"></em><span>My Profile</span></a></li>
                                                 </ul>
                                             </div>
                                             <div class="dropdown-inner">

@@ -25,9 +25,9 @@
                 <div class="nk-content ">
                     <div class="nk-block nk-block-middle wide-md mx-auto">
                         <div class="nk-block-content nk-error-ld text-center">
-                            <img class="nk-error-gfx" src="<?= base_url('assets/images') ?>/dev.avif" alt="">
+                            <img class="nk-error-gfx" width="320" src="<?= base_url('assets/images') ?>/dev.avif" alt="">
                             <div class="wide-xs mx-auto">
-                                <h3 class="nk-error-title">Oops! Why you’re here?</h3>
+                                <h3 class="nk-error-title">Under Development!</h3>
                                 <p class="nk-error-text">We apologize for the inconvenience. It looks like this page is currently under development.</p>
                                 <a href="<?= base_url('home') ?>" class="btn btn-lg btn-primary mt-2">Back To Home</a>
                             </div>

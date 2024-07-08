@@ -26,4 +26,4 @@ $route['add-permission'] = 'users/view_add_permission';
 $route['process-permission'] = 'users/process_add_permission';
 
 // Rute untuk settings
-$route['profile'] = 'settings/profile';
+$route['under-development'] = 'errors/index';

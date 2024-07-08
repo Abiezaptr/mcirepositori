@@ -76,6 +76,7 @@ class Document extends CI_Controller
         $name               = $this->input->post('name', true);
         $description        = $this->input->post('description', true);
         $summary            = $this->input->post('summary', true);
+        $keyword            = $this->input->post('keyword', true);
         $file               = $_FILES['file']['name'];
         $thumbnail          = $_FILES['thumbnail']['name'];
 
@@ -118,6 +119,7 @@ class Document extends CI_Controller
             'summary'       => $summary,
             'file'          => $file,
             'thumbnail'     => $thumbnail,
+            'keyword'       => $keyword,
             'upload_date'   => date('Y-m-d H:i:s'),
         ];
 
@@ -145,38 +147,6 @@ class Document extends CI_Controller
         $this->session->set_flashdata('success', 'Document and thumbnail uploaded successfully');
         redirect('home');
     }
-
-
-    // public function view($id)
-    // {
-    //     $data['title'] = "Detail Document";
-
-    //     $this->db->select('document.*, type.name as type_name');
-    //     $this->db->from('document');
-    //     $this->db->join('type', 'type.id = document.type_id');
-    //     $this->db->where('document.id', $id);
-    //     $document = $this->db->get()->row();
-
-    //     if ($document) {
-    //         $filename = pathinfo($document->file, PATHINFO_FILENAME);
-    //         $filename = preg_replace('/[_\-]+/', ' ', $filename); // Mengganti semua underscore dan dash dengan spasi
-    //         $filename = preg_replace('/\d{2,4}/', '', $filename); // Menghapus angka yang muncul berurutan
-    //         $filename = ucwords($filename); // Kapitalisasi setiap kata
-    //         $document->file_name = $filename;
-
-    //         // Update or insert into user_views
-    //         $user_id = $this->session->userdata('id'); // Asumsi user_id tersimpan di session
-    //         $this->updateUserViews($user_id, $id);
-    //     }
-
-    //     $data['document'] = $document;
-    //     $data['logs'] = $this->get_upload_logs();
-    //     $data['read_logs'] = $this->get_user_read_logs();
-
-    //     $this->load->view('template/header', $data);
-    //     $this->load->view('document/detail', $data);
-    //     $this->load->view('template/footer');
-    // }
 
     public function view($id)
     {
@@ -348,10 +318,20 @@ class Document extends CI_Controller
     public function update($id)
     {
         $data['title'] = "Update Document";
-        $this->db->select('document.*, category.category_name');
+
+        $query = $this->db->get('type'); // Mengambil data dari tabel types
+        $type = $query->result();
+        $data['type'] = $type; // Menambahkan data type ke array data yang akan dikirim ke view
+
+        $query = $this->db->get('product'); // Mengambil data dari tabel product
+        $product = $query->result();
+        $data['product'] = $product; // Menambahkan data product ke array data yang akan dikirim ke view
+
+        $this->db->select('document.*, type.name AS type_name, product.name AS product_name');
         $this->db->from('document');
-        $this->db->join('category', 'category.category_id = document.category_id');
-        $this->db->where('document.document_id', $id);
+        $this->db->join('type', 'type.id = document.type_id');
+        $this->db->join('product', 'product.id = document.product_id');
+        $this->db->where('document.id', $id);
         $document = $this->db->get()->row();
 
         if ($document) {
@@ -384,25 +364,76 @@ class Document extends CI_Controller
     public function update_process()
     {
         $document_id = $this->input->post('document_id', true);
+        $type_id     = $this->input->post('type_id', true);
+        $product_id  = $this->input->post('product_id', true);
+        $user_id     = $this->input->post('user_id', true);
+        $name        = $this->input->post('name', true);
         $description = $this->input->post('description', true);
-
-        // Membuat array data hanya dengan deskripsi yang diperbarui
-        $data = [
-            'description' => $description,
-        ];
+        $summary     = $this->input->post('summary', true);
+        $keyword     = $this->input->post('keyword', true);
 
         // Mengatur zona waktu ke Asia/Jakarta
         date_default_timezone_set('Asia/Jakarta');
-        $data['last_viewed'] = date('Y-m-d H:i:s'); // Memperbarui waktu terakhir dilihat jika diperlukan
+
+        // Mengambil file dan thumbnail saat ini dari database
+        $document = $this->db->get_where('document', ['id' => $document_id])->row();
+
+        // Periksa apakah ada file baru yang diunggah
+        if (!empty($_FILES['file']['name'])) {
+            $config['upload_path']   = './uploads';
+            $config['allowed_types'] = 'pdf';
+            $this->load->library('upload', $config);
+
+            if (!$this->upload->do_upload('file')) {
+                $this->session->set_flashdata('error', 'File upload failed');
+                redirect('document');
+            } else {
+                $file = $this->upload->data('file_name');
+                $this->session->set_flashdata('success', 'File uploaded successfully');
+            }
+        } else {
+            $file = $document->file; // Tetap menggunakan file yang lama jika tidak ada file baru
+        }
+
+        // Periksa apakah ada thumbnail baru yang diunggah
+        if (!empty($_FILES['thumbnail']['name'])) {
+            $config['upload_path']   = './uploads/thumbnail';
+            $config['allowed_types'] = 'jpg|jpeg|png|gif';
+            $this->upload->initialize($config);
+
+            if (!$this->upload->do_upload('thumbnail')) {
+                $this->session->set_flashdata('error', 'Thumbnail upload failed');
+                redirect('document');
+            } else {
+                $thumbnail = $this->upload->data('file_name');
+                $this->session->set_flashdata('success', 'Thumbnail uploaded successfully');
+            }
+        } else {
+            $thumbnail = $document->thumbnail; // Tetap menggunakan thumbnail yang lama jika tidak ada thumbnail baru
+        }
+
+        // Membuat array data yang diperbarui
+        $data = [
+            'type_id'       => $type_id,
+            'product_id'    => $product_id,
+            'user_id'       => $user_id,
+            'name'          => $name,
+            'description'   => $description,
+            'summary'       => $summary,
+            'file'          => $file,
+            'thumbnail'     => $thumbnail,
+            'keyword'       => $keyword,
+        ];
 
         // Memperbarui data di database
-        $this->db->where('document_id', $document_id);
+        $this->db->where('id', $document_id);
         $this->db->update('document', $data);
 
         // Mengatur pesan sukses dan mengarahkan kembali ke halaman home
-        $this->session->set_flashdata('success', 'Document description updated successfully');
+        $this->session->set_flashdata('success', 'Document updated successfully');
         redirect('home');
     }
+
 
     public function remove($id)
     {
@@ -488,26 +519,32 @@ class Document extends CI_Controller
         $keyword = $this->input->post('keyword', true);
         $type_id = $this->input->post('type_id', true);
 
+        // Escape dan sesuaikan format keyword
         $keyword = $this->db->escape_like_str($keyword);
         $keyword = str_replace(['_', '-'], ' ', $keyword);
 
-        $sql = "SELECT document.id as document_id, document.description, document.thumbnail, document.upload_date, document.name as document_name, file, type.name as work_type
-            FROM document
-            JOIN type ON type.id = document.type_id
-            WHERE 1=1"; // Tambahkan kondisi 1=1 untuk mempermudah penambahan kondisi berikutnya
+        // Query untuk mendapatkan dokumen berdasarkan keyword dan jenis dokumen
+        $sql = "SELECT document.id as document_id, document.description, document.summary, document.thumbnail, document.upload_date, document.name as document_name, file, type.name as work_type
+        FROM document
+        JOIN type ON type.id = document.type_id
+        WHERE 1=1"; // Kondisi awal
 
+        // Tambahkan kondisi untuk pencarian berdasarkan keyword
         if (!empty($keyword)) {
             $sql .= " AND (REPLACE(REPLACE(document.name, '_', ' '), '-', ' ') LIKE '%$keyword%' 
-                 OR REPLACE(REPLACE(file, '_', ' '), '-', ' ') LIKE '%$keyword%')";
+             OR REPLACE(REPLACE(file, '_', ' '), '-', ' ') LIKE '%$keyword%')";
         }
 
+        // Tambahkan kondisi untuk jenis dokumen tertentu jika dipilih
         if ($type_id != 'all') {
             $type_id = $this->db->escape_str($type_id);
             $sql .= " AND type.id = '$type_id'";
         }
 
+        // Eksekusi query dan ambil hasilnya
         $query = $this->db->query($sql);
 
+        // Format hasil query ke dalam array dokumen yang akan di-encode ke JSON
         $documents = [];
         foreach ($query->result() as $row) {
             $filename = pathinfo($row->file, PATHINFO_FILENAME);
@@ -515,16 +552,19 @@ class Document extends CI_Controller
             $filename = preg_replace('/\d{2,4}/', '', $filename);
             $filename = ucwords($filename);
             $documents[] = [
+                'document_id' => $row->document_id,
                 'name' => $row->document_name,
                 'label' => $filename,
                 'value' => $row->document_id,
                 'description' => $row->description,
+                'summary' => $row->summary,
                 'thumbnail' => $row->thumbnail,
                 'upload_date' => $row->upload_date,
                 'work_type' => $row->work_type
             ];
         }
 
+        // Encode array dokumen ke dalam format JSON dan kirimkan sebagai respons
         echo json_encode($documents);
     }
 }

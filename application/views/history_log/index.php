@@ -16,13 +16,13 @@
                                <div class="card-inner">
                                    <ul class="nav nav-tabs mt-n3">
                                        <li class="nav-item">
-                                           <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1">Login history</a>
+                                           <a class="nav-link active" data-bs-toggle="tab" href="#tabItem1">Login Activity</a>
                                        </li>
                                        <li class="nav-item">
-                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem2">Document views history</a>
+                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem2">Views Activity</a>
                                        </li>
                                        <li class="nav-item">
-                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem3">Document download history</a>
+                                           <a class="nav-link" data-bs-toggle="tab" href="#tabItem3">Download Activity</a>
                                        </li>
                                    </ul>
                                    <div class="tab-content">

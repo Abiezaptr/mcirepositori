@@ -18,12 +18,22 @@
                                       <form action="<?= site_url('document/uploads') ?>" method="post" enctype="multipart/form-data">
                                           <input type="hidden" name="user_id" value="<?= $this->session->userdata('id') ?>">
                                           <div class="row gy-4">
-                                              <div class="col-sm-12">
+                                              <div class="col-sm-6">
                                                   <div class="form-group">
                                                       <label class="form-label" for="default-06">Document Name <span class="text-danger">*</span></label>
                                                       <div class="form-control-wrap">
                                                           <div class="form-file">
-                                                              <input type="text" class="form-control" name="name" placeholder="Masukkan nama dokumen / Enter document name">
+                                                              <input type="text" class="form-control" name="name" placeholder="Masukkan nama dokumen / Enter document name" autocomplete="off">
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                              <div class="col-sm-6">
+                                                  <div class="form-group">
+                                                      <label class="form-label" for="default-06">Keyword <span class="text-danger">*</span></label>
+                                                      <div class="form-control-wrap">
+                                                          <div class="form-file">
+                                                              <input type="text" class="form-control" name="keyword" placeholder="Masukkan keyword untuk pencarian" autocomplete="off">
                                                           </div>
                                                       </div>
                                                   </div>

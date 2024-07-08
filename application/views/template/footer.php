@@ -159,44 +159,71 @@
 
                           for (var type_id in groupedDocuments) {
                               var filtered_documents = groupedDocuments[type_id];
-                              var type_name = filtered_documents[0].type_name; // Assuming each group has the same type_name
+                              var type_name = filtered_documents[0].work_type; // Assuming each group has the same work_type
 
                               documentHtml += `
-                                <div class="row mb-4">
-                                    <div class="col mt-3">
-                                        <h4>Search Result</h4>
-                                    </div>
+                            <div class="row mb-4">
+                                <div class="col mt-3">
+                                    <h4>Search Result</h4>
                                 </div>
-                                <div class="row overflow-auto" style="max-height: 400px;">`;
+                            </div>
+                            <div class="row overflow-auto" style="max-height: 400px;">`;
 
-                              var count = 0;
                               filtered_documents.forEach(function(document) {
-                                  if (count < 9) {
-                                      var uploadDate = new Date(document.upload_date);
-                                      var formattedDate = uploadDate.toLocaleDateString('en-US', {
-                                          day: 'numeric',
-                                          month: 'long',
-                                          year: 'numeric'
-                                      });
+                                  var uploadDate = new Date(document.upload_date);
+                                  var formattedDate = uploadDate.toLocaleDateString('en-US', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric'
+                                  });
 
-                                      documentHtml += `
-                                        <div class="col-md-4 mb-4">
-                                            <div class="card h-100">
-                                                ${document.thumbnail ? `
-                                                    <img src="<?= base_url('uploads/thumbnail/') ?>${document.thumbnail}" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.value}" style="max-height: 200px; object-fit: cover;">` : `
-                                                    <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
-                                                        <img src="<?= base_url('assets/images/pdf.png') ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.value}" style="max-width: 80%; max-height: 80%; object-fit: contain;">
-                                                    </div>`}
-                                                <div class="card-body" style="height: 70px;">
-                                                   <span>${document.name}</span>
-                                                </div>
-                                                <div class="card-footer">
-                                                    <small class="text-muted">${formattedDate}</small>
-                                                </div>
+                                  var thumbnailHtml = document.thumbnail ? `
+                                <img src="<?= base_url('uploads/thumbnail/') ?>${document.thumbnail}" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.document_id}" style="max-height: 200px; object-fit: cover;">` : `
+                                <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                                    <img src="<?= base_url('assets/images/pdf.png') ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.document_id}" style="max-width: 80%; max-height: 80%; object-fit: contain;">
+                                </div>`;
+
+                                  documentHtml += `
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        ${thumbnailHtml}
+                                        <div class="card-body" style="height: 70px;">
+                                            <span>${document.name}</span>
+                                        </div>
+                                        <div class="card-footer">
+                                            <small class="text-muted">${formattedDate}</small>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                                  // Modal for each document
+                                  documentHtml += `
+                                <div class="modal fade zoom" tabindex="-1" id="modalZoom${document.document_id}">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">${document.name}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                        </div>`;
-                                      count++;
-                                  }
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h6><small><i><b>${type_name}</b></i></small></h6>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h6><small><i><b><em class="icon ni ni-clock"></em> Upload time : ${formattedDate}</b></i></small></h6>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <p>${document.summary}</p>
+                                            </div>
+                                            <div class="modal-footer bg-light">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="<?= site_url('document/view/') ?>${document.document_id}" class="btn btn-primary">Open</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
                               });
 
                               documentHtml += `</div>`;
@@ -226,7 +253,6 @@
           });
       });
   </script>
-
 
   <!-- List data table -->
   <script>
