@@ -122,7 +122,7 @@
   </script>
 
   <!-- Filter data -->
-  <script>
+  <!-- <script>
       $(document).ready(function() {
           function filterDocuments() {
               var keyword = $('#keyword').val();
@@ -252,7 +252,140 @@
               }
           });
       });
+  </script> -->
+
+  <script>
+      $(document).ready(function() {
+          function filterDocuments() {
+              var keyword = $('#keyword').val();
+              var type_id = $('#type_id').val();
+
+              console.log("Filter triggered");
+              console.log("Keyword: " + keyword);
+              console.log("Category ID: " + type_id);
+
+              $.ajax({
+                  url: '<?= site_url("document/search_documents") ?>',
+                  method: 'POST',
+                  data: {
+                      keyword: keyword,
+                      type_id: type_id
+                  },
+                  success: function(response) {
+                      console.log("Response received");
+                      console.log(response);
+
+                      var documents = JSON.parse(response);
+                      var documentHtml = '';
+
+                      if (documents.length > 0) {
+                          var groupedDocuments = {};
+
+                          // Group documents by type_id
+                          documents.forEach(function(document) {
+                              if (!groupedDocuments[document.work_type]) {
+                                  groupedDocuments[document.work_type] = [];
+                              }
+                              groupedDocuments[document.work_type].push(document);
+                          });
+
+                          for (var type_id in groupedDocuments) {
+                              var filtered_documents = groupedDocuments[type_id];
+                              var type_name = filtered_documents[0].work_type; // Assuming each group has the same work_type
+
+                              documentHtml += `
+                            <div class="row mb-4">
+                                <div class="col mt-3">
+                                    <h4>Search Result</h4>
+                                </div>
+                            </div>
+                            <div class="row overflow-auto" style="max-height: 400px;">`;
+
+                              filtered_documents.forEach(function(document) {
+                                  var uploadDate = new Date(document.upload_date);
+                                  var formattedDate = uploadDate.toLocaleDateString('en-US', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric'
+                                  });
+
+                                  var thumbnailHtml = document.thumbnail ? `
+                                <img src="<?= base_url('uploads/thumbnail/') ?>${document.thumbnail}" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.document_id}" style="max-height: 200px; object-fit: cover;">` : `
+                                <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                                    <img src="<?= base_url('assets/images/pdf.png') ?>" class="card-img-top" alt="Thumbnail" data-bs-toggle="modal" data-bs-target="#modalZoom${document.document_id}" style="max-width: 80%; max-height: 80%; object-fit: contain;">
+                                </div>`;
+
+                                  documentHtml += `
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        ${thumbnailHtml}
+                                        <div class="card-body" style="height: 70px;">
+                                            <span>${document.name}</span>
+                                        </div>
+                                        <div class="card-footer">
+                                            <small class="text-muted">${formattedDate}</small>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                                  // Modal for each document
+                                  documentHtml += `
+                                <div class="modal fade zoom" tabindex="-1" id="modalZoom${document.document_id}">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">${document.name}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h6><small><i><b>${type_name}</b></i></small></h6>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h6><small><i><b><em class="icon ni ni-clock"></em> Upload time : ${formattedDate}</b></i></small></h6>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <p>${document.summary}</p>
+                                            </div>
+                                            <div class="modal-footer bg-light">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <a href="<?= site_url('document/view/') ?>${document.document_id}" class="btn btn-primary">Open</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                              });
+
+                              documentHtml += `</div>`;
+                          }
+                      } else {
+                          documentHtml = '<p>No documents found</p>';
+                      }
+
+                      $('#document-container').html(documentHtml);
+                  },
+                  error: function(xhr, status, error) {
+                      console.error("Error occurred: " + status + " " + error);
+                  }
+              });
+          }
+
+          $('#keyword').on('input', filterDocuments);
+          $('#type_id').on('change', filterDocuments);
+
+          // Add event listener to clear keyword and refresh page
+          $('#keyword').on('keyup', function(event) {
+              if (event.key === 'Backspace' || event.key === 'Delete') {
+                  if ($('#keyword').val().length === 0) {
+                      location.reload();
+                  }
+              }
+          });
+      });
   </script>
+
 
   <!-- List data table -->
   <script>
