@@ -287,7 +287,7 @@
                                                             <div class="nk-notification-item dropdown-inner">
                                                                 <div class="nk-notification-content">
                                                                     <div class="nk-notification-text">
-                                                                        <?php echo $log->username; ?> <span>telah menambah dokumen baru, </span> <br>
+                                                                        <?php echo $log->username; ?> <span><?php echo $log->message; ?> </span> <br>
                                                                         <b><?php echo $log->document_name; ?></b>
                                                                     </div>
                                                                     <div class="nk-notification-time" data-upload-time="<?php echo $log->upload_time; ?>">

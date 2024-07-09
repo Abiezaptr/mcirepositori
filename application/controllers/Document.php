@@ -378,16 +378,23 @@ class Document extends CI_Controller
         // Mengambil file dan thumbnail saat ini dari database
         $document = $this->db->get_where('document', ['id' => $document_id])->row();
 
+        // Load library upload
+        $this->load->library('upload');
+
         // Periksa apakah ada file baru yang diunggah
         if (!empty($_FILES['file']['name'])) {
             $config['upload_path']   = './uploads';
             $config['allowed_types'] = 'pdf';
-            $this->load->library('upload', $config);
+            $this->upload->initialize($config);
 
             if (!$this->upload->do_upload('file')) {
                 $this->session->set_flashdata('error', 'File upload failed');
                 redirect('document');
             } else {
+                // Hapus file lama jika ada
+                if (file_exists('./uploads/' . $document->file)) {
+                    unlink('./uploads/' . $document->file);
+                }
                 $file = $this->upload->data('file_name');
                 $this->session->set_flashdata('success', 'File uploaded successfully');
             }
@@ -405,6 +412,10 @@ class Document extends CI_Controller
                 $this->session->set_flashdata('error', 'Thumbnail upload failed');
                 redirect('document');
             } else {
+                // Hapus thumbnail lama jika ada
+                if (file_exists('./uploads/thumbnail/' . $document->thumbnail)) {
+                    unlink('./uploads/thumbnail/' . $document->thumbnail);
+                }
                 $thumbnail = $this->upload->data('file_name');
                 $this->session->set_flashdata('success', 'Thumbnail uploaded successfully');
             }
@@ -428,6 +439,24 @@ class Document extends CI_Controller
         // Memperbarui data di database
         $this->db->where('id', $document_id);
         $this->db->update('document', $data);
+
+        // Insert ke tabel upload_log
+        $session_user_id = $this->session->userdata('id'); // Menggunakan 'id' dari session
+        $this->db->select('username');
+        $this->db->from('users');
+        $this->db->where('id', $session_user_id);
+        $query = $this->db->get();
+        $user = $query->row();
+
+        // Simpan log ke dalam tabel upload_log
+        $log_data = [
+            'user_id'       => $user_id,
+            'document_id'   => $document_id,
+            'upload_time'   => date('Y-m-d H:i:s'), // Menggunakan waktu Asia/Jakarta
+            'message'       => $user->username . ' telah memperbarui dokumen, ' . $name,
+            'is_read'       => false
+        ];
+        $this->db->insert('upload_log', $log_data);
 
         // Mengatur pesan sukses dan mengarahkan kembali ke halaman home
         $this->session->set_flashdata('success', 'Document updated successfully');
